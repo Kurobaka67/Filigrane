@@ -1,0 +1,22 @@
+{
+    "title1":"Ajoutez un filigrane à n'importe quel document pdf sans risque",
+    "flag": "frenchFlag",
+    "english": "Anglais",
+    "french": "Français",
+    "german": "Allemand",
+    "spanisch": "Espagnol",
+    "chooseFile": "Choisir un fichier",
+    "watermarkTitle": "Indiquez le filigrane à insérer",
+    "moreOptions": "Plus d'options",
+    "lessOptions": "Moins d'options",
+    "fontSizeTitle": "Choisissez la taille de la police",
+    "fontColorTitle": "Choisissez la couleur de la police",
+    "lineRepetitionTitle": "Choisissez le nombre de répétition sur une ligne",
+    "lineNumberTitle": "Choisissez le nombre de ligne",
+    "texteDirectionTitle": "Choisissez l'orientation du texte",
+    "leftDirection": "45° vers la gauche",
+    "horizontalDirection": "Horizontale",
+    "rightDirection": "45° vers la droite",
+    "verticalDirection": "Verticale",
+    "download": "Télécharger"
+}

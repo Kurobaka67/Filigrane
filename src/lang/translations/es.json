@@ -1,0 +1,22 @@
+{
+    "title1":"Agregue una marca de agua a cualquier documento pdf sin riesgos",
+    "flag": "spanishFlag",
+    "english": "Inglés",
+    "french": "Francés",
+    "german": "Alemán",
+    "spanisch": "Español",
+    "chooseFile": "Escoge un archivo",
+    "watermarkTitle": "Indique la marca de agua a insertar",
+    "moreOptions": "Mas opciones",
+    "lessOptions": "Menos opciones",
+    "fontSizeTitle": "Elige el tamaño de fuente",
+    "fontColorTitle": "Elige color de fuente",
+    "lineRepetitionTitle": "Elige el número de repeticiones en una línea.",
+    "lineNumberTitle": "Elige el número de líneas",
+    "texteDirectionTitle": "Elige la orientación del texto",
+    "leftDirection": "45° a la izquierda",
+    "horizontalDirection": "Horizontal",
+    "rightDirection": "45° a la derecha",
+    "verticalDirection": "Vertical",
+    "download": "Descargar"
+}

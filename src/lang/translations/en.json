@@ -1,0 +1,22 @@
+{
+    "title1":"Add a watermark to any pdf document risk-free",
+    "flag": "englishFlag",
+    "english": "English",
+    "french": "French",
+    "german": "German",
+    "spanisch": "Spanish",
+    "chooseFile": "Choose a file",
+    "watermarkTitle": "Indicate the watermark to insert",
+    "moreOptions": "More options",
+    "lessOptions": "Less options",
+    "fontSizeTitle": "Choose font size",
+    "fontColorTitle": "Choose font color",
+    "lineRepetitionTitle": "Choose the number of repetitions on a line",
+    "lineNumberTitle": "Choose the number of lines",
+    "texteDirectionTitle": "Choose the text direction",
+    "leftDirection": "45° to the left",
+    "horizontalDirection": "Horizontal",
+    "rightDirection": "45° to the right",
+    "verticalDirection": "Vertical",
+    "download": "Download"
+}

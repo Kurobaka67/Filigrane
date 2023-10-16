@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, type ObjectHTMLAttributes } from 'vue'
 import { degrees, PDFDocument, rgb, StandardFonts, type Color, PDFFont } from 'pdf-lib';
-import {Base64} from 'js-base64';
 async function bufferToBase64(buffer : any) {
   // use a FileReader to generate a base64 data URI:
   const base64url = await new Promise(r => {
@@ -30,7 +29,8 @@ export default defineComponent({
             pdfHeight: 0 as number,
             optionsDisplay: 'none' as string,
             animationArrow: '' as string,
-            displayColorPanel: 'none' as string
+            displayColorPanel: 'none' as string,
+            lang: 'fr' as string
         }
     },
     methods: {
@@ -113,6 +113,9 @@ export default defineComponent({
         hideColorPanel(){
             this.displayColorPanel = 'none';
         },
+        getImageUrl(flag: string){
+            return '/src/assets/'+flag+'.svg';
+        },
         async modifyPdf() {
             if(this.file){
                 const pdfDoc = await PDFDocument.load(this.arrayBuffer as ArrayBuffer)
@@ -127,7 +130,6 @@ export default defineComponent({
                     finalText += " " + this.text
                 }
                 var h = 0
-                var j = 0
                 switch (this.degree) {
                     case "-45":
                         h = height;
@@ -197,7 +199,7 @@ export default defineComponent({
 
 <template>
     <div class="main">
-        <h1>Ajoutez un filigrane à n'importe quel document pdf sans risque</h1>
+        <h1>{{ $t('title1') }}</h1>
         <div class="pen">
             <svg
                 width="120.14106mm"
@@ -245,18 +247,19 @@ export default defineComponent({
                     transform="translate(-222.81112,-28.558204)">
                     <path
                     id="rect2491"
-                    style="fill:#282828;stroke:#282828;stroke-width:0;stroke-linecap:round;stroke-dasharray:none;paint-order:fill markers stroke"
+                    style="fill:#425166;stroke:#425166;stroke-width:0;stroke-linecap:round;stroke-dasharray:none;paint-order:fill markers stroke"
                     d="m 242.44791,28.573098 -19.63679,5.415895 19.63843,5.409985 z m 3.77935,-5.62e-4 0.002,10.825873 81.44022,-0.01224 0.002,10.982229 -27.18874,0.0041 c -1.17734,1.67e-4 -2.125,0.863587 -2.12484,1.935903 1.4e-4,1.072314 0.94809,1.935437 2.12541,1.935264 l 29.31457,-0.0044 c 1.1773,-1.77e-4 2.12498,-0.863591 2.12482,-1.935907 -7.2e-4,-0.0088 2.6e-4,-0.01628 -4.9e-4,-0.02498 l -0.002,-12.891183 10.33037,-0.0031 c 0.38874,-7.7e-5 0.70166,-0.504275 0.7016,-0.85834 l -10e-4,-9.255501 c 3.9e-4,-0.354069 -0.4533,-0.712104 -0.84206,-0.712049 l -10.20343,0.0015 0.003,10.810546 -4.23344,6.24e-4 -0.002,-10.810549 z" />
                     <g
                     id="rect2648"
                     transform="rotate(-30.081268)" />
                 </g>
                 </svg>
+            <img class="flag" :src="getImageUrl($t('flag'))" alt="">
             <div class="background"></div>
         </div>
         <object class="mg-bt-30" :data="get_file_base64()" type="application/pdf"/>
         <div class="mg-bt-30 mg-lf-30">
-            <label class="pdfButton mg-rg-5" for="pdfFile">Choisir un fichier</label>
+            <label class="pdfButton mg-rg-5" for="pdfFile">{{ $t('chooseFile') }}</label>
             <span class="pdfName">{{file?file.name:''}}</span>
             <input id="pdfFile"
                 type="file"
@@ -264,55 +267,55 @@ export default defineComponent({
                 accept=".pdf"
             />
         </div>
-        <label class="mg-bt-10" for="text">Indiquez le filigrane à insérer : </label>
+        <label class="mg-bt-10" for="text">{{ $t('watermarkTitle') }} : </label>
         <input class="mg-bt-30" id="text" type="text" size="100" @change="modifyPdf()" v-model="text">
-        <div class="options">
-            <button class="moreOptions" @click="showOptions()"><i class="fas fa-arrow-down fa-spin" :style="{'animation-name': animationArrow}"></i> {{animationArrow=='spin-up'?"Moins d'options":"Plus d'options"}} </button>
-            <div class="hideOptions" :style="{'display': optionsDisplay}">
-                <div class="column mg-bt-30">
-                    <div>
-                        <label class="mg-rg-5" for="size">Choisissez la taille de la police : </label>
-                        <input id="size" type="number" @change="modifyPdf()" v-model="sizeFont">
-                    </div>
-                    <div>
-                        <label class="mg-rg-5" for="color">Choisissez la couleur de la police : </label>
-                        <button class="colorSelector" @click="showColorPanel()" :style="{'background-color': colorFont.hex8}"></button>
-                        <Chrome class="color" id="color" v-model="colorFont" :style="{'display': displayColorPanel}"/>
-                    </div>
+        <button class="moreOptions" @click="showOptions()"><i class="fas fa-arrow-down fa-spin" :style="{'animation-name': animationArrow}"></i> {{animationArrow=='spin-up'?$t('lessOptions'):$t('moreOptions')}} </button>
+        <div class="hideOptions" :style="{'display': optionsDisplay}">
+            <div class="column mg-bt-30">
+                <div>
+                    <label class="mg-rg-5" for="size">{{ $t('fontSizeTitle') }} : </label>
+                    <input id="size" type="number" @change="modifyPdf()" v-model="sizeFont">
                 </div>
-                <div class="column mg-bt-30">
-                    <div>
-                        <label class="mg-rg-5" for="recurrence">Choisissez le nombre de répétition sur une ligne : </label>
-                        <input id="recurrence" type="number" @change="modifyPdf()" v-model="recurrenceLine"/>
-                    </div>
-                    <div>
-                        <label class="mg-rg-5" for="line">Choisissez le nombre de ligne : </label>
-                        <input id="line" type="number" @change="modifyPdf()" v-model="numberLine"/>
-                    </div>
+                <div>
+                    <label class="mg-rg-5" for="color">{{ $t('fontColorTitle') }} : </label>
+                    <button class="colorSelector" @click="showColorPanel()" :style="{'background-color': colorFont.hex8}"></button>
+                    <Chrome class="color" id="color" v-model="colorFont" :style="{'display': displayColorPanel}"/>
                 </div>
-                <fieldset class="degree">
-                    <legend>Choisissez l'orientation du texte : </legend>
-                    <div>
-                        <input id="\" type="radio" name="degree" value="-45" @change="modifyPdf()" v-model="degree"/>
-                        <label for="\">45° vers la gauche (\)</label>
-                    </div>
-                    <div>
-                        <input id="horizontal" type="radio" name="degree" value="0" @change="modifyPdf()" v-model="degree"/>
-                        <label for="horizontal">Horizontale</label>
-                    </div>
-                    <div>
-                        <input id="/" type="radio" name="degree" value="45" @change="modifyPdf()" v-model="degree"/>
-                        <label for="/">45° vers la droite (/)</label>
-                    </div>
-                    <div>
-                        <input id="vertical" type="radio" name="degree" value="90" @change="modifyPdf()" v-model="degree"/>
-                        <label for="vertical">Verticale</label>
-                    </div>
-                </fieldset>
             </div>
+            <div class="column mg-bt-30">
+                <div>
+                    <label class="mg-rg-5" for="recurrence">{{ $t('lineRepetitionTitle') }} : </label>
+                    <input id="recurrence" type="number" @change="modifyPdf()" v-model="recurrenceLine"/>
+                </div>
+                <div>
+                    <label class="mg-rg-5" for="line">{{ $t('lineNumberTitle') }} : </label>
+                    <input id="line" type="number" @change="modifyPdf()" v-model="numberLine"/>
+                </div>
+            </div>
+            <fieldset class="degree">
+                <legend>{{ $t('texteDirectionTitle') }} : </legend>
+                <div>
+                    <input id="\" type="radio" name="degree" value="-45" @change="modifyPdf()" v-model="degree"/>
+                    <label for="\">{{ $t('leftDirection') }} (\)</label>
+                </div>
+                <div>
+                    <input id="horizontal" type="radio" name="degree" value="0" @change="modifyPdf()" v-model="degree"/>
+                    <label for="horizontal">{{ $t('horizontalDirection') }}</label>
+                </div>
+                <div>
+                    <input id="/" type="radio" name="degree" value="45" @change="modifyPdf()" v-model="degree"/>
+                    <label for="/">{{ $t('rightDirection') }} (/)</label>
+                </div>
+                <div>
+                    <input id="vertical" type="radio" name="degree" value="90" @change="modifyPdf()" v-model="degree"/>
+                    <label for="vertical">{{ $t('verticalDirection') }}</label>
+                </div>
+            </fieldset>
         </div>
-        <div class="bot" :style="{'top': optionsDisplay=='none'?'500px':'755px'}">
-            <button class="download" @click="download_pdf()"><b>Télécharger</b></button>
+        <div class="bot" >
+            <button class="download" @click="download_pdf()"><b>{{ $t('download') }}</b></button>
+            <div class="background"></div>
         </div>
     </div>
+    
 </template>

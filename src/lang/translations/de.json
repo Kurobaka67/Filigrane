@@ -1,0 +1,22 @@
+{
+    "title1":"Fügen Sie jedem PDF-Dokument risikolos ein Wasserzeichen hinzu",
+    "flag": "germanFlag",
+    "english": "Englisch",
+    "french": "Französisch",
+    "german": "Deutsch",
+    "spanisch": "Spanisch",
+    "chooseFile": "Wähle eine Datei",
+    "watermarkTitle": "Geben Sie das einzufügende Wasserzeichen an",
+    "moreOptions": "Mehr Optionen",
+    "lessOptions": "Weniger Optionen",
+    "fontSizeTitle": "Wählen Sie die Schriftgröße",
+    "fontColorTitle": "Wählen Sie die Schriftfarbe",
+    "lineRepetitionTitle": "Wählen Sie die Anzahl der Wiederholungen in einer Zeile",
+    "lineNumberTitle": "Wählen Sie die Anzahl der Zeilen",
+    "texteDirectionTitle": "Wählen Sie die Textausrichtung",
+    "leftDirection": "45° nach links",
+    "horizontalDirection": "Horizontal",
+    "rightDirection": "45° nach rechts",
+    "verticalDirection": "Vertikal",
+    "download": "Herunterladen"
+}
