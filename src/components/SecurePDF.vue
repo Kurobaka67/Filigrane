@@ -1,6 +1,8 @@
 <script lang="ts">
-import { defineComponent, ref, type ObjectHTMLAttributes } from 'vue'
+import { defineComponent } from 'vue'
 import { degrees, PDFDocument, rgb, StandardFonts, type Color, PDFFont } from 'pdf-lib';
+import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import { jsPDF } from "jspdf";
 async function bufferToBase64(buffer : any) {
   // use a FileReader to generate a base64 data URI:
   const base64url = await new Promise(r => {
@@ -11,14 +13,16 @@ async function bufferToBase64(buffer : any) {
   // remove the `data:...;base64,` part from the start
   return base64url;
 }
+let pdfBytes = null as Uint8Array | null;
 export default defineComponent({
     name:'SecurePDF',
+    components: {VuePDF},
     data() {
         return {
             file: null as File | null,
             base64: "" as string | null | undefined,
             arrayBuffer: null as ArrayBuffer | null,
-            pdfBytes: null as Uint8Array | null,
+            
             sizeFont: 50 as number,
             text: 'This text was added with JavaScript!' as string,
             colorFont: {rgba: {a: 1, b: 0, r: 255, g: 0,}, hex8: '#FF0000FF'},
@@ -30,7 +34,8 @@ export default defineComponent({
             optionsDisplay: 'none' as string,
             animationArrow: '' as string,
             displayColorPanel: 'none' as string,
-            lang: 'fr' as string
+            lang: 'fr' as string,
+            pdfFile: {pdf: null, pages: null, info: null}
         }
     },
     methods: {
@@ -72,14 +77,17 @@ export default defineComponent({
             return ab;
 
         },
-        download_pdf(){
-            if(this.pdfBytes){
-                var blob=new Blob([this.pdfBytes as Uint8Array], {type: "application/pdf"});// change resultByte to bytes
-
-                var link=document.createElement('a');
-                link.href=window.URL.createObjectURL(blob);
-                link.download="myFileName.pdf";
-                link.click();
+        async download_pdf(){
+            if(pdfBytes){
+                var blob=new Blob([pdfBytes as Uint8Array], {type: "application/pdf"});// change resultByte to bytes
+                
+                var canvas = document.getElementById("vuepdf").getElementsByTagName("canvas")
+                const dataURL = canvas[0].toDataURL('image/jpeg');
+                var doc = new jsPDF();
+                var width = doc.internal.pageSize.width;
+                var height = (canvas[0].height * width) / canvas[0].width;
+                doc.addImage(dataURL, 'PNG', 0, 0, width, height);
+                doc.save("myFileName.pdf");
             }
         },
         get_file_base64(){
@@ -116,12 +124,15 @@ export default defineComponent({
         getImageUrl(flag: string){
             return '/src/assets/'+flag+'.svg';
         },
+        getPDF(){
+            return this.pdfFile.pdf
+        },
         async modifyPdf() {
             if(this.file){
                 const pdfDoc = await PDFDocument.load(this.arrayBuffer as ArrayBuffer)
                 const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
-                const pages = pdfDoc.getPages()
-                const firstPage = pages[0]
+                const page = pdfDoc.getPages()
+                const firstPage = page[0]
                 const { width, height } = firstPage.getSize()
                 this.pdfWidth = width
                 this.pdfHeight = height
@@ -186,9 +197,9 @@ export default defineComponent({
                 }
                 
 
-                this.pdfBytes = await pdfDoc.save()
-                this.base64 = await bufferToBase64(this.pdfBytes) as string
-                //this.base64 = "data:application/pdf;base64," + Base64.encode(new TextDecoder('utf8').decode(this.pdfBytes))
+                pdfBytes = await pdfDoc.save()
+                this.pdfFile = usePDF(new Uint8Array(pdfBytes))
+                this.base64 = await bufferToBase64(pdfBytes) as string
             }
             
         }
@@ -198,11 +209,12 @@ export default defineComponent({
 </script>
 
 <template>
+    <h1>{{ $t('title1') }}</h1>
     <div class="main">
-        <h1>{{ $t('title1') }}</h1>
+        
         <div class="pen">
             <svg
-                width="120.14106mm"
+                width="90.14106mm"
                 height="25.685461mm"
                 viewBox="0 0 120.14106 25.685461"
                 version="1.1"
@@ -255,18 +267,78 @@ export default defineComponent({
                 </g>
                 </svg>
             <img class="flag" :src="getImageUrl($t('flag'))" alt="">
-            <div class="background"></div>
+            <div class="background">
+                <svg
+                    width="18.829798mm"
+                    height="47.21991mm"
+                    viewBox="0 0 18.829798 47.219909"
+                    version="1.1"
+                    id="svg5"
+                    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+                    sodipodi:docname="backgroundBlank.svg"
+                    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:svg="http://www.w3.org/2000/svg">
+                    <sodipodi:namedview
+                        id="namedview7"
+                        pagecolor="#ffffff"
+                        bordercolor="#000000"
+                        borderopacity="0.25"
+                        inkscape:showpageshadow="2"
+                        inkscape:pageopacity="0.0"
+                        inkscape:pagecheckerboard="0"
+                        inkscape:deskcolor="#d1d1d1"
+                        inkscape:document-units="mm"
+                        showgrid="false"
+                        inkscape:zoom="2.9006172"
+                        inkscape:cx="5.3436903"
+                        inkscape:cy="118.42307"
+                        inkscape:window-width="1920"
+                        inkscape:window-height="1001"
+                        inkscape:window-x="-9"
+                        inkscape:window-y="-9"
+                        inkscape:window-maximized="1"
+                        inkscape:current-layer="layer1" />
+                    <defs
+                        id="defs2" />
+                    <g
+                        inkscape:label="Calque 1"
+                        inkscape:groupmode="layer"
+                        id="layer1"
+                        transform="translate(-77.058074,-91.246291)">
+                        <path
+                        id="rect234"
+                        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:round;paint-order:fill markers stroke"
+                        d="m 77.058075,106.8467 18.829795,-15.600408 2e-6,31.619518 -18.829796,15.60039 z"
+                        sodipodi:nodetypes="ccccc" />
+                    </g>
+                </svg>
+            </div>
         </div>
-        <object class="mg-bt-30" :data="get_file_base64()" type="application/pdf"/>
-        <div class="mg-bt-30 mg-lf-30">
-            <label class="pdfButton mg-rg-5" for="pdfFile">{{ $t('chooseFile') }}</label>
-            <span class="pdfName">{{file?file.name:''}}</span>
-            <input id="pdfFile"
-                type="file"
-                @change="onFileChanged($event)"
-                accept=".pdf"
-            />
+        <VuePDF id="vuepdf" v-if="pdfFile.pdf" :pdf="pdfFile.pdf" />
+        <div v-if="!pdfFile.pdf" style="height: 500px"></div>
+        
+        <div class="bot">
+            <div class="botButtonLeft">
+                <div class="background"></div>
+                <div class="pdfChange">
+                    <label class="pdfButton" for="ppp"><b>{{ $t('chooseFile') }}</b></label>
+                    <input id="ppp"
+                        type="file"
+                        @change="onFileChanged($event)"
+                        accept=".pdf"
+                    />
+                </div>
+            </div>
+            <div class="botButtonRight" v-if="pdfFile.pdf">
+                <div class="background"></div>
+                <button class="download" @click="download_pdf()"><b>{{ $t('download') }}</b></button>
+                
+            </div>
         </div>
+    </div>
+    <div class="options">
         <label class="mg-bt-10" for="text">{{ $t('watermarkTitle') }} : </label>
         <input class="mg-bt-30" id="text" type="text" size="100" @change="modifyPdf()" v-model="text">
         <button class="moreOptions" @click="showOptions()"><i class="fas fa-arrow-down fa-spin" :style="{'animation-name': animationArrow}"></i> {{animationArrow=='spin-up'?$t('lessOptions'):$t('moreOptions')}} </button>
@@ -312,10 +384,5 @@ export default defineComponent({
                 </div>
             </fieldset>
         </div>
-        <div class="bot" >
-            <button class="download" @click="download_pdf()"><b>{{ $t('download') }}</b></button>
-            <div class="background"></div>
-        </div>
     </div>
-    
 </template>

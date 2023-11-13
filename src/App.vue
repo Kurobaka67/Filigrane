@@ -4,13 +4,6 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  
-  <select class="lang" name="lang" v-model="$i18n.locale">
-    <option value="en">{{ $t('english') }}</option>
-    <option value="fr">{{ $t('french') }}</option>
-    <option value="de">{{ $t('german') }}</option>
-    <option value="es">{{ $t('spanish') }}</option>
-  </select>
   <RouterView />
 </template>
 
