@@ -11,7 +11,7 @@ const options = [
   {value: 'es', label:'Español', flag:'spanishFlagIcon'}
 ];
 
-function changeLang(value) {
+function changeLang(value : string) {
   localStorage.setItem("lang", value)
 }
 </script>
@@ -27,5 +27,5 @@ function changeLang(value) {
           <span>{{ option.option.label }}</span>
         </template>
     </VueSelect>
-    <SecurePDF />
+    <SecurePDF/>
 </template>

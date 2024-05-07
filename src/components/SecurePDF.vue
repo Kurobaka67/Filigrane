@@ -1,9 +1,9 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-import { degrees, PDFDocument, rgb, StandardFonts, type Color, PDFFont } from 'pdf-lib';
+<script lang="js">
+import { defineComponent, nextTick } from 'vue'
+import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
 import { jsPDF } from "jspdf";
-async function bufferToBase64(buffer : any) {
+async function bufferToBase64(buffer) {
   // use a FileReader to generate a base64 data URI:
   const base64url = await new Promise(r => {
     const reader = new FileReader()
@@ -13,41 +13,41 @@ async function bufferToBase64(buffer : any) {
   // remove the `data:...;base64,` part from the start
   return base64url;
 }
-let pdfBytes = null as Uint8Array | null;
+let pdfBytes = null; //as Uint8Array | null;
 export default defineComponent({
     name:'SecurePDF',
     components: {VuePDF},
     data() {
         return {
-            file: null as File | null,
-            base64: "" as string | null | undefined,
-            arrayBuffer: null as ArrayBuffer | null,
+            file: null, // as File | null,
+            base64: "", // as string | null | undefined,
+            arrayBuffer: null, // as ArrayBuffer | null,
             
-            sizeFont: 50 as number,
-            text: 'This text was added with JavaScript!' as string,
-            colorFont: {rgba: {a: 1, b: 0, r: 255, g: 0,}, hex8: '#FF0000FF'},
-            recurrenceLine: 1 as number,
-            numberLine: 6 as number,
-            degree: "-45" as string,
-            pdfWidth: 0 as number,
-            pdfHeight: 0 as number,
-            optionsDisplay: 'none' as string,
-            animationArrow: '' as string,
-            displayColorPanel: 'none' as string,
-            lang: 'fr' as string,
-            pdfFile: {pdf: null, pages: null, info: null}
+            sizeFont: localStorage.getItem("sizeFont")?JSON.parse(localStorage.getItem("sizeFont")):50, // as number,
+            text: localStorage.getItem("text")?JSON.parse(localStorage.getItem("text")):'This text was added with JavaScript!', // as string,
+            colorFont: localStorage.getItem("colorFont")?JSON.parse(localStorage.getItem("colorFont")):{rgba: {a: 1, b: 0, r: 255, g: 0,}, hex8: '#FF0000FF'},
+            recurrenceLine: localStorage.getItem("recurrenceLine")?JSON.parse(localStorage.getItem("recurrenceLine")):1, // as number,
+            numberLine: localStorage.getItem("numberLine")?JSON.parse(localStorage.getItem("numberLine")):6, // as number,
+            degree: localStorage.getItem("degree")?JSON.parse(localStorage.getItem("degree")):"-45", // as string,
+            pdfWidth: 0, // as number,
+            pdfHeight: 0, // as number,
+            optionsDisplay: 'none', //as string,
+            animationArrow: '', // as string,
+            showColor: false, // as boolean,
+            lang: 'fr', // as string,
+            pdfFile: {pdf: null, }
         }
     },
     methods: {
-        onFileChanged($event: Event) {
-            const target = $event.target as HTMLInputElement;
+        onFileChanged($event) {
+            const target = $event.target; // as HTMLInputElement;
             if (target && target.files) {
                 this.file = target.files[0];
                 // FileReader function for read the file.
                 var fileReader = new FileReader();
                 // Onload of file read the file content
                 fileReader.onload = (fileLoadedEvent) => {
-                    this.base64 = fileLoadedEvent.target?.result as string;
+                    this.base64 = fileLoadedEvent.target?.result; // as string;
                     this.arrayBuffer = this.dataURItoBlob(this.base64)
                     this.modifyPdf()
                 };
@@ -56,7 +56,7 @@ export default defineComponent({
                 
             }
         },
-        dataURItoBlob(dataURI: string) : ArrayBuffer {
+        dataURItoBlob(dataURI) {
             // convert base64 to raw binary data held in a string
             // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
             var byteString = atob(dataURI.split(',')[1]);
@@ -79,9 +79,8 @@ export default defineComponent({
         },
         async download_pdf(){
             if(pdfBytes){
-                var blob=new Blob([pdfBytes as Uint8Array], {type: "application/pdf"});// change resultByte to bytes
-                
-                var canvas = document.getElementById("vuepdf").getElementsByTagName("canvas")
+                var canvas = undefined;
+                canvas = document.getElementById("vuepdf").getElementsByTagName("canvas")
                 const dataURL = canvas[0].toDataURL('image/jpeg');
                 var doc = new jsPDF();
                 var width = doc.internal.pageSize.width;
@@ -93,9 +92,9 @@ export default defineComponent({
         get_file_base64(){
             return this.base64==null?undefined:this.base64;
         },
-        get_string_pixel_length(str: string, font: PDFFont, size: number){
+        get_string_pixel_length(str, font, size){
             var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+            var ctx = canvas.getContext("2d");// as CanvasRenderingContext2D;
             ctx.font = size + "px " + font.name;        
             var width = ctx.measureText(str).width;
             return width/2;
@@ -111,25 +110,23 @@ export default defineComponent({
             }
         },
         showColorPanel(){
-            if(this.displayColorPanel == 'none'){
-                this.displayColorPanel = 'block';
-            }
-            else{
-                this.displayColorPanel = 'none';
-            }
+            this.showColor = true;
+            nextTick(() => {
+                document.getElementById("color")?.focus();
+            })
         },
         hideColorPanel(){
-            this.displayColorPanel = 'none';
+            this.showColor = false;
         },
-        getImageUrl(flag: string){
+        getImageUrl(flag){
             return '/src/assets/'+flag+'.svg';
         },
         getPDF(){
-            return this.pdfFile.pdf
+            return this.pdfFile?.pdf
         },
         async modifyPdf() {
             if(this.file){
-                const pdfDoc = await PDFDocument.load(this.arrayBuffer as ArrayBuffer)
+                const pdfDoc = await PDFDocument.load(this.arrayBuffer)
                 const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
                 const page = pdfDoc.getPages()
                 const firstPage = page[0]
@@ -183,7 +180,7 @@ export default defineComponent({
                     }
                 }
                 else{
-                    for(let i=width/(this.numberLine+1); i < width; i+=width/(this.numberLine+1)){
+                    for(let i=-width/2; i < width*1.5; i+=width/(this.numberLine+1)*2){
                         firstPage.drawText(finalText, {
                             x: i - height/2,
                             y: h,
@@ -199,8 +196,14 @@ export default defineComponent({
 
                 pdfBytes = await pdfDoc.save()
                 this.pdfFile = usePDF(new Uint8Array(pdfBytes))
-                this.base64 = await bufferToBase64(pdfBytes) as string
+                this.base64 = await bufferToBase64(pdfBytes) //as string
             }
+
+            const stor = [{str: "text", el: this.text},{str: "sizeFont", el: this.sizeFont},
+                {str: "recurrenceLine", el: this.recurrenceLine}, {str: "numberLine", el: this.numberLine},
+                {str: "degree", el: this.degree}, {str: "colorFont", el: this.colorFont}]
+
+            stor.forEach(element => localStorage.setItem(element.str, JSON.stringify(element.el)))
             
         }
     }
@@ -209,11 +212,33 @@ export default defineComponent({
 </script>
 
 <template>
-    <h1>{{ $t('title1') }}</h1>
     <div class="main">
-        
+        <h1>{{ $t('title1') }}</h1>
+        <div class="card">
+            <VuePDF id="vuepdf" v-if="pdfFile?.pdf" :pdf="pdfFile?.pdf" />
+            <div v-if="!pdfFile?.pdf" style="height: 400px"></div>
+            
+            <div class="bot">
+                <div class="botButtonLeft">
+                    <div class="background"></div>
+                    <div class="pdfChange">
+                        <label class="pdfButton" for="ppp"><b>{{ $t('chooseFile') }}</b></label>
+                        <input id="ppp"
+                            type="file"
+                            @change="onFileChanged($event)"
+                            accept=".pdf"
+                        />
+                    </div>
+                </div>
+                <div class="botButtonRight" v-if="pdfFile?.pdf">
+                    <div class="background"></div>
+                    <button class="download" @click="download_pdf()"><b>{{ $t('download') }}</b></button>
+                    
+                </div>
+            </div>
+        </div>
         <div class="pen">
-            <svg
+            <svg class="icon"
                 width="90.14106mm"
                 height="25.685461mm"
                 viewBox="0 0 120.14106 25.685461"
@@ -265,7 +290,7 @@ export default defineComponent({
                     id="rect2648"
                     transform="rotate(-30.081268)" />
                 </g>
-                </svg>
+            </svg>
             <img class="flag" :src="getImageUrl($t('flag'))" alt="">
             <div class="background">
                 <svg
@@ -316,73 +341,51 @@ export default defineComponent({
                 </svg>
             </div>
         </div>
-        <VuePDF id="vuepdf" v-if="pdfFile.pdf" :pdf="pdfFile.pdf" />
-        <div v-if="!pdfFile.pdf" style="height: 500px"></div>
-        
-        <div class="bot">
-            <div class="botButtonLeft">
-                <div class="background"></div>
-                <div class="pdfChange">
-                    <label class="pdfButton" for="ppp"><b>{{ $t('chooseFile') }}</b></label>
-                    <input id="ppp"
-                        type="file"
-                        @change="onFileChanged($event)"
-                        accept=".pdf"
-                    />
+        <div class="options">
+            <label class="mg-bt-10 mg-lf-5p" for="text">{{ $t('watermarkTitle') }} : </label>
+            <input class="mg-bt-30 mg-lf-5p" id="text" type="text" size="100" @change="modifyPdf()" v-model="text">
+            <button class="moreOptions" @click="showOptions()"><i class="fas fa-arrow-down fa-spin" :style="{'animation-name': animationArrow}"></i> {{animationArrow=='spin-up'?$t('lessOptions'):$t('moreOptions')}} </button>
+            <div class="hideOptions" :style="{'display': optionsDisplay}">
+                <div class="grid">
+                    <div>
+                        <label class="mg-rg-5" for="size">{{ $t('fontSizeTitle') }} : </label>
+                        <input id="size" type="number" @change="modifyPdf()" v-model="sizeFont">
+                    </div>
+                    <div>
+                        <label class="mg-rg-5" for="color">{{ $t('fontColorTitle') }} : </label>
+                        <button class="colorSelector" @click="showColorPanel()" :style="{'background-color': colorFont.hex8}"></button>
+                        <Chrome class="color" id="color" v-model="colorFont" @show="console.log('here')" v-show="showColor" tabindex="0" @focus="console.log('hey')" @blur="hideColorPanel()" @click="modifyPdf()" />
+                    </div>
+                    <div>
+                        <label class="mg-rg-5" for="recurrence">{{ $t('lineRepetitionTitle') }} : </label>
+                        <input id="recurrence" type="number" @change="modifyPdf()" v-model="recurrenceLine"/>
+                    </div>
+                    <div>
+                        <label class="mg-rg-5" for="line">{{ $t('lineNumberTitle') }} : </label>
+                        <input id="line" type="number" @change="modifyPdf()" v-model="numberLine"/>
+                    </div>
                 </div>
-            </div>
-            <div class="botButtonRight" v-if="pdfFile.pdf">
-                <div class="background"></div>
-                <button class="download" @click="download_pdf()"><b>{{ $t('download') }}</b></button>
                 
+                <fieldset class="degree">
+                    <legend>{{ $t('texteDirectionTitle') }} : </legend>
+                    <div>
+                        <input id="\" type="radio" name="degree" value="-45" @change="modifyPdf()" v-model="degree"/>
+                        <label for="\">{{ $t('leftDirection') }} (\)</label>
+                    </div>
+                    <div>
+                        <input id="horizontal" type="radio" name="degree" value="0" @change="modifyPdf()" v-model="degree"/>
+                        <label for="horizontal">{{ $t('horizontalDirection') }}</label>
+                    </div>
+                    <div>
+                        <input id="/" type="radio" name="degree" value="45" @change="modifyPdf()" v-model="degree"/>
+                        <label for="/">{{ $t('rightDirection') }} (/)</label>
+                    </div>
+                    <div>
+                        <input id="vertical" type="radio" name="degree" value="90" @change="modifyPdf()" v-model="degree"/>
+                        <label for="vertical">{{ $t('verticalDirection') }}</label>
+                    </div>
+                </fieldset>
             </div>
-        </div>
-    </div>
-    <div class="options">
-        <label class="mg-bt-10" for="text">{{ $t('watermarkTitle') }} : </label>
-        <input class="mg-bt-30" id="text" type="text" size="100" @change="modifyPdf()" v-model="text">
-        <button class="moreOptions" @click="showOptions()"><i class="fas fa-arrow-down fa-spin" :style="{'animation-name': animationArrow}"></i> {{animationArrow=='spin-up'?$t('lessOptions'):$t('moreOptions')}} </button>
-        <div class="hideOptions" :style="{'display': optionsDisplay}">
-            <div class="column mg-bt-30">
-                <div>
-                    <label class="mg-rg-5" for="size">{{ $t('fontSizeTitle') }} : </label>
-                    <input id="size" type="number" @change="modifyPdf()" v-model="sizeFont">
-                </div>
-                <div>
-                    <label class="mg-rg-5" for="color">{{ $t('fontColorTitle') }} : </label>
-                    <button class="colorSelector" @click="showColorPanel()" :style="{'background-color': colorFont.hex8}"></button>
-                    <Chrome class="color" id="color" v-model="colorFont" :style="{'display': displayColorPanel}"/>
-                </div>
-            </div>
-            <div class="column mg-bt-30">
-                <div>
-                    <label class="mg-rg-5" for="recurrence">{{ $t('lineRepetitionTitle') }} : </label>
-                    <input id="recurrence" type="number" @change="modifyPdf()" v-model="recurrenceLine"/>
-                </div>
-                <div>
-                    <label class="mg-rg-5" for="line">{{ $t('lineNumberTitle') }} : </label>
-                    <input id="line" type="number" @change="modifyPdf()" v-model="numberLine"/>
-                </div>
-            </div>
-            <fieldset class="degree">
-                <legend>{{ $t('texteDirectionTitle') }} : </legend>
-                <div>
-                    <input id="\" type="radio" name="degree" value="-45" @change="modifyPdf()" v-model="degree"/>
-                    <label for="\">{{ $t('leftDirection') }} (\)</label>
-                </div>
-                <div>
-                    <input id="horizontal" type="radio" name="degree" value="0" @change="modifyPdf()" v-model="degree"/>
-                    <label for="horizontal">{{ $t('horizontalDirection') }}</label>
-                </div>
-                <div>
-                    <input id="/" type="radio" name="degree" value="45" @change="modifyPdf()" v-model="degree"/>
-                    <label for="/">{{ $t('rightDirection') }} (/)</label>
-                </div>
-                <div>
-                    <input id="vertical" type="radio" name="degree" value="90" @change="modifyPdf()" v-model="degree"/>
-                    <label for="vertical">{{ $t('verticalDirection') }}</label>
-                </div>
-            </fieldset>
         </div>
     </div>
 </template>
