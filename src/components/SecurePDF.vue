@@ -118,11 +118,11 @@ export default defineComponent({
         hideColorPanel(){
             this.showColor = false;
         },
-        getImageUrl(flag){
-            return '/src/assets/'+flag+'.svg';
+        getImageURL(img){
+            return `./flags/${img}.svg`;
         },
         getPDF(){
-            return this.pdfFile?.pdf
+            return this.pdfFile?.pdf;
         },
         async modifyPdf() {
             if(this.file){
@@ -271,7 +271,7 @@ export default defineComponent({
                     transform="rotate(-30.081268)" />
                 </g>
             </svg>
-            <img class="flag" :src="getImageUrl($t('flag'))" alt="">
+            <img class="flag" :src="getImageURL($t('flag'))" alt="">
             <div class="background">
                 <svg
                     width="18.829798mm"

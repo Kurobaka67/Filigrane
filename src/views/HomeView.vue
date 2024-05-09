@@ -19,11 +19,11 @@ function changeLang(value : string) {
 <template>
     <VueSelect v-model="$i18n.locale" :options="options" label-by="label" value-by="value" @update:modelValue="value => changeLang(value)" hide-selected close-on-select>
         <template #label="option">
-          <img :src="'/src/assets/'+option.selected.flag+'.svg'" style="width: 20px">
+          <img :src="`./flags/${option.selected.flag}.svg`" style="width: 20px">
           <span>{{ option.selected.label }}</span>
         </template>
         <template #dropdown-item="option">
-          <img :src="'/src/assets/'+option.option.flag+'.svg'" style="width: 20px">
+          <img :src="`./flags/${option.option.flag}.svg`" style="width: 20px">
           <span>{{ option.option.label }}</span>
         </template>
     </VueSelect>
